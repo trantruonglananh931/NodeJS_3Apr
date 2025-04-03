@@ -18,7 +18,7 @@ router.get('/:category', async function(req, res) {
     if (!category) {
       return res.status(404).json({ success: false, message: "Danh mục không tồn tại" });
     }
-    let products = await productModel.find({ category: category._id }).populate("category", "name slug");
+    let products = await productModel.find({ category: category._id }).populate("category", "name");
     res.status(200).json({ success: true, data: products });
   } catch (error) {
     res.status(500).json({ success: false, message: "Lỗi khi lấy sản phẩm trong danh mục", error: error.message });
@@ -32,7 +32,7 @@ router.get('/:category/:product', async function(req, res) {
     if (!category) {
       return res.status(404).json({ success: false, message: "Danh mục không tồn tại" });
     }
-    let product = await productModel.findOne({ slug: req.params.product, category: category._id }).populate("category", "name slug");
+    let product = await productModel.findOne({ slug: req.params.product, category: category._id }).populate("category", "name");
     if (!product) {
       return res.status(404).json({ success: false, message: "Không tìm thấy sản phẩm" });
     }
