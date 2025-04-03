@@ -42,8 +42,6 @@ let productSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-
-// Trước khi lưu vào database, tự động tạo slug từ tên sản phẩm
 productSchema.pre('save', function(next) {
     this.slug = slugify(this.name, { lower: true, strict: true });
     next();
