@@ -21,7 +21,7 @@ router.get('/slug/:category', async function(req, res) {
     }
 
     // Lấy tất cả sản phẩm trong danh mục
-    let products = await productModel.find({ category: category._id }).populate("category");
+    let products = await productModel.find({ category: category._id }).populate("category", "name slug");
 
     res.status(200).json({ success: true, data: products });
   } catch (error) {
