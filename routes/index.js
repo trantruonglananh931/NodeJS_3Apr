@@ -40,7 +40,7 @@ router.get('/slug/:category/:product', async function(req, res) {
     }
 
     // Tìm sản phẩm theo slug và category
-    let product = await productModel.findOne({ slug: req.params.product, category: category._id }).populate("category");
+    let product = await productModel.findOne({ slug: req.params.product, category: category._id }).populate("category", "name slug");
 
     if (!product) {
       return res.status(404).json({ success: false, message: "Không tìm thấy sản phẩm" });
