@@ -28,21 +28,31 @@ router.post('/login', async function (req, res, next) {
 });
 router.post('/signup', validationSiginUp, validate, async function (req, res, next) {
     try {
-        let body = req.body;
-        let username = body.username;
-        let password = body.password;
-        let email = body.email
-        let result = await userController.CreateAnUser(
-            username, password, email, 'user');
+        let { username, password, email, fullName, phone, address } = req.body;
+
+        // Gọi controller để tạo user với role mặc định là 'user'
+        let result = await userController.CreateAnUser({
+            username,
+            password,
+            email,
+            fullName,
+            phone,
+            address,
+            roleName: 'user' // luôn là 'user' khi đăng ký
+        });
+
+        // Tạo token
         let token = jwt.sign({
             id: result._id,
             expire: new Date(Date.now() + 24 * 3600 * 1000)
-        }, constants.SECRET_KEY)
+        }, constants.SECRET_KEY);
+
         CreateSuccessRes(res, 200, token);
     } catch (error) {
-        next(error)
+        next(error);
     }
 });
+
 router.get("/me", check_authentication, async function (req, res, next) {
     CreateSuccessRes(res, 200, req.user);
 })

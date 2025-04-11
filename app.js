@@ -9,6 +9,8 @@ var {CreateErrorRes} = require('./utils/ResHandler')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
+var session = require('express-session');
+
 var app = express();
 
 // view engine setup
@@ -21,12 +23,21 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(session({
+  secret: 'ban-co-the-dat-chuoi-bi-mat-o-day',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { maxAge: 60 * 60 * 1000 } // session sống 1 tiếng
+}));
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/roles', require('./routes/roles'));
 app.use('/auth', require('./routes/auth'));
 app.use('/products', require('./routes/products'));
 app.use('/categories', require('./routes/categories'));
+app.use('/cart', require('./routes/cart'));
+app.use('/order', require('./routes/order'));
 //
 mongoose.connect('mongodb://localhost:27017/C5');
 mongoose.connection.on('connected',function(){
@@ -47,5 +58,6 @@ app.use(function(err, req, res, next) {
   // render the error page
   CreateErrorRes(res,err.status||500,err)
 });
+
 
 module.exports = app;

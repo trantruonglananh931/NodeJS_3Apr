@@ -12,7 +12,7 @@ router.get('/', function(req, res, next) {
 });
 
 // Lấy tất cả sản phẩm trong một danh mục theo slug
-router.get('/:category', async function(req, res) {
+router.get('danhmuc/:category', async function(req, res) {
   try {
     let category = await categoryModel.findOne({ slug: req.params.category });
     if (!category) {
@@ -26,7 +26,7 @@ router.get('/:category', async function(req, res) {
 });
 
 // Lấy sản phẩm theo slug category và slug sản phẩm
-router.get('/:category/:product', async function(req, res) {
+router.get('danhmuc/:category/:product', async function(req, res) {
   try {
     let category = await categoryModel.findOne({ slug: req.params.category });
     if (!category) {
