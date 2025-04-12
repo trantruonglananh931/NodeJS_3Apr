@@ -3,6 +3,8 @@ var router = express.Router();
 const slugify = require('slugify');
 let productModel = require('../schemas/product');
 let CategoryModel = require('../schemas/category');
+let {check_authentication,check_authorization} = require('../utils/check_auth')
+let constants = require('../utils/constants')
 
 function buildQuery(obj) {
   let result = {};
@@ -59,7 +61,7 @@ router.get('/:id', async function(req, res) {
 
 
 // Thêm sản phẩm mới
-router.post('/', async function(req, res) {
+router.post('/',check_authentication,check_authorization(constants.ADMIN_PERMISSION), async function(req, res) {
   try {
     let category = await CategoryModel.findOne({ name: req.body.category });
     
@@ -83,7 +85,7 @@ router.post('/', async function(req, res) {
 });
 
 // Cập nhật sản phẩm
-router.put('/:id', async function(req, res) {
+router.put('/:id',check_authentication,check_authorization(constants.ADMIN_PERMISSION), async function(req, res) {
   try {
     let updateObj = {};
     let { name, price, quantity, category } = req.body;
@@ -115,8 +117,8 @@ router.put('/:id', async function(req, res) {
   }
 });
 
-// Xóa sản phẩm (đánh dấu isDeleted)
-router.delete('/:id', async function(req, res) {
+// Xóa sản phẩm 
+router.delete('/:id',check_authentication,check_authorization(constants.ADMIN_PERMISSION), async function(req, res) {
   try {
     let product = await productModel.findById(req.params.id);
     
@@ -127,7 +129,7 @@ router.delete('/:id', async function(req, res) {
     product.isDeleted = true;
     await product.save();
 
-    res.status(200).json({ success: true, data: product });
+    res.status(200).json({ success: true, message: "Xóa sản phẩm thành công"});
   } catch (error) {
     res.status(500).json({ success: false, message: "Lỗi khi xóa sản phẩm", error: error.message });
   }

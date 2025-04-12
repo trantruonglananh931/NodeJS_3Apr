@@ -14,18 +14,51 @@ let mailer = require('../utils/mailer')
 router.post('/login', async function (req, res, next) {
     try {
         let body = req.body;
-        let username = body.username;
-        let password = body.password
-        let result = await userController.Login(username, password);
+        if (!body.username || !body.password) {
+            return CreateErrorRes(res, 400, "Vui lòng nhập username và password");
+        }
+    
+        let result = await userController.Login(body.username, body.password);
+        
         let token = jwt.sign({
             id: result._id,
+            role: result.role.name, 
             expire: new Date(Date.now() + 24 * 3600 * 1000)
-        }, constants.SECRET_KEY)
-        CreateSuccessRes(res, 200, token);
+        }, constants.SECRET_KEY);
+        
+        req.session.token = token;
+        req.session.user = {
+            id: result._id,
+            username: result.username,
+            fullName: result.fullName,
+            role: result.role.name 
+        };
+        
+        CreateSuccessRes(res, 200, { 
+            token,
+            user: {
+                id: result._id,
+                username: result.username,
+                fullName: result.fullName,
+                role: result.role.name, 
+      
+            }
+        });
     } catch (error) {
-        next(error)
+        CreateErrorRes(res, 401, error.message);
     }
 });
+
+router.post('/logout', check_authentication, function(req, res) {
+    try {
+      req.session.destroy(() => {
+        res.status(200).json({ message: 'Logged out successfully' });
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+  
 router.post('/signup', validationSiginUp, validate, async function (req, res, next) {
     try {
         let { username, password, email, fullName, phone, address } = req.body;

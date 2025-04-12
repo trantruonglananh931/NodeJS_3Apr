@@ -2,8 +2,9 @@ var express = require('express');
 var router = express.Router();
 let categoryModel = require('../schemas/category');
 let productModel = require('../schemas/product');
+let {check_authentication,check_authorization} = require('../utils/check_auth')
+let constants = require('../utils/constants')
 
-// Lấy danh sách categories
 router.get('/', async function(req, res) {
   try {
     let categories = await categoryModel.find({});
@@ -21,15 +22,9 @@ router.get('/', async function(req, res) {
   }
 });
 
-// Lấy danh mục theo ID
 router.get('/:id', async function(req, res) {
   try {
     let { id } = req.params;
-
-    // Kiểm tra xem ID có đúng định dạng MongoDB ObjectId không
-    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.status(400).json({ success: false, message: "ID không hợp lệ" });
-    }
 
     let category = await categoryModel.findById(id);
     if (!category) {
@@ -42,8 +37,7 @@ router.get('/:id', async function(req, res) {
   }
 });
 
-// Tạo danh mục mới
-router.post('/', async function(req, res) {
+router.post('/',check_authentication,check_authorization(constants.ADMIN_PERMISSION), async function(req, res) {
   try {
     if (!req.body.name) {
       return res.status(400).json({ success: false, message: "Tên danh mục không được để trống" });
@@ -60,6 +54,45 @@ router.post('/', async function(req, res) {
   }
 });
 
+router.put('/:id', check_authentication, check_authorization(constants.ADMIN_PERMISSION), async function(req, res) {
+  try {
+    let { id } = req.params;
+    let { name } = req.body;
+
+    if (!name || name.trim() === '') {
+      return res.status(400).json({ success: false, message: "Tên danh mục không được để trống" });
+    }
+
+    let updatedCategory = await categoryModel.findByIdAndUpdate(
+      id,
+      { name: name },
+      { new: true }
+    );
+
+    if (!updatedCategory) {
+      return res.status(404).json({ success: false, message: "Không tìm thấy danh mục để cập nhật" });
+    }
+
+    res.status(200).json({ success: true, data: updatedCategory });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Lỗi khi cập nhật danh mục", error: error.message });
+  }
+});
+
+router.delete('/:id' , check_authentication, check_authorization(constants.ADMIN_PERMISSION), async function(req, res) {
+  try {
+    let { id } = req.params;
+
+    let deletedCategory = await categoryModel.findByIdAndDelete(id);
+    if (!deletedCategory) {
+      return res.status(404).json({ success: false, message: "Không tìm thấy danh mục để xóa" });
+    }
+
+    res.status(200).json({ success: true, message: "Danh mục đã được xóa thành công" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Lỗi khi xóa danh mục", error: error.message });
+  }
+});
 
 
 module.exports = router;

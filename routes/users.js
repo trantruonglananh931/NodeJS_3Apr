@@ -40,6 +40,18 @@ router.put('/:id', async function (req, res, next) {
   }
 })
 
+router.delete('/:id', check_authentication, check_authorization(constants.ADMIN_PERMISSION), async function (req, res, next) {
+  try {
+    let deletedUser = await userController.SoftDeleteUser(req.params.id);
+    if (!deletedUser) {
+      return CreateErrorRes(res, 404, "Không tìm thấy người dùng để xóa");
+    }
+    CreateSuccessRes(res, 200, "Người dùng đã được đánh dấu là đã xóa thành công");
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 
 module.exports = router;

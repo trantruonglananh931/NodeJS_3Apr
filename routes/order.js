@@ -3,7 +3,7 @@ const router = express.Router();
 const orderController = require('../controllers/orders');
 const { check_authentication } = require('../utils/check_auth');
 
-router.post('/create', check_authentication, orderController.CreateOrder);
+router.post('/', check_authentication, orderController.CreateOrder);
 
 // Lấy toàn bộ đơn hàng
 router.get('/', async (req, res) => {

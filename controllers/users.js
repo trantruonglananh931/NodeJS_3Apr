@@ -61,16 +61,24 @@ module.exports = {
     },
 
     Login: async function (username, password) {
-        const user = await userSchema.findOne({ username });
-
+        // Thêm .populate('role') để lấy thông tin role
+        const user = await userSchema.findOne({ username }).populate('role');
+        
         if (!user) {
             throw new Error("username hoặc mật khẩu không đúng");
         }
-
+    
         if (bcrypt.compareSync(password, user.password)) {
             return user;
         } else {
             throw new Error("username hoặc mật khẩu không đúng");
         }
+    },
+    SoftDeleteUser: async (id) => {
+        return await userSchema.findByIdAndUpdate(
+            id,
+            { isDelete: true },
+            { new: true }
+        );
     }
 };
