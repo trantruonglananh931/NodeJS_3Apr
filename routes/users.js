@@ -14,7 +14,7 @@ router.get('/',check_authentication,check_authorization(constants.ADMIN_PERMISSI
     next(error)
   }
 });
-router.get('/:id',check_authentication,check_authorization(constants.MOD_PERMISSION), async function (req, res, next) {
+router.get('/:id',check_authentication,check_authorization(constants.ADMIN_PERMISSION), async function (req, res, next) {
   try {
     let user = await userController.GetUserById(req.params.id)
     CreateSuccessRes(res, 200, user);
