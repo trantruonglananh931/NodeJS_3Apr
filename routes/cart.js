@@ -3,16 +3,12 @@ const router = express.Router();
 const cartController = require('../controllers/carts');
 const { check_authentication } = require('../utils/check_auth');
 
-// Thêm sản phẩm vào giỏ (cần đăng nhập)
-router.post('/', check_authentication, cartController.addToCart);
+router.post('/', cartController.addToCart);
 
-// Cập nhật số lượng sản phẩm (cần đăng nhập)
-router.put('/', check_authentication, cartController.updateCart);
+router.put('/', cartController.updateCart);
 
-// Xem giỏ hàng (cần đăng nhập)
-router.get('/', check_authentication, cartController.getCart);
+router.get('/', cartController.getCart);
 
-// Xoá sản phẩm khỏi giỏ (cần đăng nhập)
-router.delete('/', check_authentication, cartController.removeFromCart);
+router.delete('/', cartController.removeFromCart);
 
 module.exports = router;

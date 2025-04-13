@@ -5,7 +5,6 @@ const { check_authentication } = require('../utils/check_auth');
 
 router.post('/', check_authentication, orderController.CreateOrder);
 
-// Lấy toàn bộ đơn hàng
 router.get('/', async (req, res) => {
     try {
         const orders = await orderController.GetAllOrders();
@@ -15,7 +14,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Lấy chi tiết đơn theo ID
+
 router.get('/:id', async (req, res) => {
     try {
         const order = await orderController.GetOrderById(req.params.id);

@@ -4,7 +4,7 @@ let bcrypt = require('bcrypt');
 
 module.exports = {
     GetAllUser: async () => {
-        return await userSchema.find({}).populate('role');
+        return await userSchema.find({ isDeleted: false }).populate('role');
     },
 
     GetUserById: async (id) => {
@@ -19,7 +19,7 @@ module.exports = {
         return await userSchema.findOne({ tokenResetPassword: token }).populate('role');
     },
 
-    CreateAnUser: async ({ username, password, email, fullName, phone, address }) => {
+    CreateAnUser: async ({ username, password, email, fullName, phone, address,avatarUrl = ""  }) => {
         const GetRole = await roleController.GetRoleByName('user');
         if (!GetRole) {
             throw new Error("Role 'user' không tồn tại");
@@ -32,6 +32,7 @@ module.exports = {
             fullName,
             phone,
             address,
+            avatarUrl,
             role: GetRole._id
         });
 
@@ -39,9 +40,9 @@ module.exports = {
     },
 
     UpdateUser: async function (id, body) {
-        const allowFields = ["password", "email", "imgURL", "fullName", "phone", "address"];
+        const allowFields = ["password", "email", "avatarUrl", "fullName", "phone", "address"];
         const user = await userSchema.findById(id);
-
+    
         if (user) {
             for (const key of Object.keys(body)) {
                 if (allowFields.includes(key)) {
@@ -51,6 +52,7 @@ module.exports = {
             return await user.save();
         }
     },
+    
 
     DeleteUser: async function (id) {
         const user = await userSchema.findById(id);
@@ -75,10 +77,11 @@ module.exports = {
         }
     },
     SoftDeleteUser: async (id) => {
-        return await userSchema.findByIdAndUpdate(
-            id,
-            { isDelete: true },
-            { new: true }
-        );
-    }
+    return await userSchema.findByIdAndUpdate(
+        id,
+        { isDeleted: true },
+        { new: true }
+    );
+},
+
 };

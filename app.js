@@ -8,7 +8,7 @@ var {CreateErrorRes} = require('./utils/ResHandler')
 const cors = require('cors');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-
+var uploadRoutes = require('./routes/upload');
 var session = require('express-session');
 
 var app = express();
@@ -35,6 +35,7 @@ app.use(session({
 }));
 
 app.use('/', indexRouter);
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use('/users', usersRouter);
 app.use('/roles', require('./routes/roles'));
 app.use('/auth', require('./routes/auth'));

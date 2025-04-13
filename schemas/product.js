@@ -26,7 +26,7 @@ let productSchema = new mongoose.Schema({
         default: 0,
         min: 0
     },
-    imgURL: {
+    imgUrl: {
         type: String,
         default: ""
     },

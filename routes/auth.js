@@ -9,7 +9,8 @@ let bcrypt = require('bcrypt')
 let { validate, validationSiginUp } = require('../utils/validator')
 let crypto = require('crypto')
 let mailer = require('../utils/mailer')
-
+const createUploader = require('../routes/upload');
+const uploadAvatar = createUploader('avatars');
 /* GET users listing. */
 router.post('/login', async function (req, res, next) {
     try {
@@ -59,11 +60,13 @@ router.post('/logout', check_authentication, function(req, res) {
     }
   });
   
-router.post('/signup', validationSiginUp, validate, async function (req, res, next) {
+router.post('/signup', uploadAvatar.single('avatarUrl'), validationSiginUp, validate, async function (req, res, next) {
     try {
         let { username, password, email, fullName, phone, address } = req.body;
-
-        // Gọi controller để tạo user với role mặc định là 'user'
+        let avatarUrl = "";
+        if (req.file) {
+            avatarUrl = `/uploads/avatars/${req.file.filename}`;
+        }
         let result = await userController.CreateAnUser({
             username,
             password,
@@ -71,10 +74,10 @@ router.post('/signup', validationSiginUp, validate, async function (req, res, ne
             fullName,
             phone,
             address,
-            roleName: 'user' // luôn là 'user' khi đăng ký
+            avatarUrl,
+            roleName: 'user'
         });
 
-        // Tạo token
         let token = jwt.sign({
             id: result._id,
             expire: new Date(Date.now() + 24 * 3600 * 1000)
